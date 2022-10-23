@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <title>Demo Dapp</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        background: #000;
+      }
+      html,
+      body,
+      div {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        -webkit-touch-callout: none;
+        /* iOS Safari */
+        -webkit-user-select: none;
+        /* Safari */
+        -khtml-user-select: none;
+        /* Konqueror HTML */
+        -moz-user-select: none;
+        /* Old versions of Firefox */
+        -ms-user-select: none;
+        /* Internet Explorer/Edge */
+        user-select: none;
+        /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+      }
+
+      .top {
+        background-image: url("brushstroke_purple.png");
+        background-position: top right;
+        background-repeat: no-repeat;
+        background-size: 399px 434px;
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+      }
+
+      .bottom {
+        background-image: url("brushstroke_blue.png");
+        background-position: bottom -100px left;
+        background-origin: 100 0;
+        background-repeat: no-repeat;
+        background-size: 423px 548px;
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .done {
+        transform: scale(0.7);
+        background-image: url("pill.png");
+        background-size: 374px 48.5px;
+        background-repeat: no-repeat;
+        width: 374px;
+        height: 48.5px;
+        margin-bottom: 50px;
+        opacity: 0;
+        animation: fadeIn 1s;
+        /*animation-timing-function: ease-out;*/
+        animation-delay: 1s;
+        animation-fill-mode: forwards;
+        /* When the spec is finished */
+      }
+
+      .icons {
+        background-image: url("icons.png");
+        background-size: 109px 59px;
+        width: 109px;
+        height: 59px;
+        margin-bottom: 50px;
+      }
+
+      .btn {
+        background-image: url("cta.png");
+        background-size: 332.5px 54px;
+        background-repeat: no-repeat;
+        width: 333px;
+        height: 54px;
+        z-index: 100;
+        cursor: pointer;
+      }
+
+      .btn.hover {
+        opacity: 0.9;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="script.js"></script>
+
+    <div class="top"></div>
+    <div class="bottom"></div>
+    <div class="wrapper">
+      <div class="done hidden"></div>
+      <!--<div class="icons"></div>-->
+      <div
+        class="btn"
+        onclick="navigator.platform !== 'iPhone' && connect()"
+        ontouchstart='document.getElementsByClassName("btn")[0].classList.add("hover")'
+        ontouchend='document.getElementsByClassName("btn")[0].classList.remove("hover"); connect()'
+      ></div>
+    </div>
+
+    <!--
+  This script places a badge on your repl's full-browser view back to your repl's cover
+  page. Try various colors for the theme: dark, light, red, orange, yellow, lime, green,
+  teal, blue, blurple, magenta, pink!
+  --></body>
+
+  <script>
+    window.connect = async function () {
+      const plaidWeb3 = await Plaid.web3();
+      const handler = plaidWeb3.createEthereumOnboarding({
+        // retrieve from https://dashboard.plaid.com/team/wallet-onboard
+        token: "link-sandbox-b05993eb-9eb9-4ff2-8573-1264c033f071",
+        chain: {
+          // RPC gateway URL to use for non-wallet methods
+          rpcUrl: "https://cloudflare-eth.com/v1/mainnet",
+          // EVM chain ID in hexadecimal format as described in https://eips.ethereum.org/EIPS/eip-695
+          // See https://chainlist.org/ for a list of common chains
+          chainId: "0x1",
+        },
+        onSuccess: async (provider) => {
+          // provider is an EIP-1193 compatible JavaScript object https://eips.ethereum.org/EIPS/eip-1193
+          // provider can be used by other libraries to request more data
+          document.getElementsByClassName("btn")[0].classList.add("hidden");
+          document.getElementsByClassName("icons")[0] &&
+            document.getElementsByClassName("icons")[0].classList.add("hidden");
+          document.getElementsByClassName("done")[0].classList.remove("hidden");
+        },
+        onExit: (error, metadata) => {
+          // Optional callback, called if the user exits without connecting a wallet
+          // See https://plaid.com/docs/link/web/#onexit for details
+        },
+      });
+      handler.open();
+    };
+  </script>
+</html>
