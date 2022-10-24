@@ -46,7 +46,7 @@
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x5" }],
+          params: [{ chainId: "0x1" }],
         });
       } catch (e) {
         // Documented MetaMask behavior
@@ -69,10 +69,10 @@
       const plaidWeb3 = await window.Plaid.web3();
       const chain = {
         // RPC gateway URL to use for non-wallet methods
-        rpcUrl: "https://cloudflare-eth.com/v1/goerli",
+        rpcUrl: "https://cloudflare-eth.com/v1/mainnet",
         // EVM chain ID in hexadecimal format as described in https://eips.ethereum.org/EIPS/eip-695
         // See https://chainlist.org/ for a list of common chains
-        chainId: "0x5",
+        chainId: "0x1",
       };
 
       const provider = await plaidWeb3.getCurrentEthereumProvider(chain);

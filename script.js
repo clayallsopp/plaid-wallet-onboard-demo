@@ -38,7 +38,7 @@ var onConnect = async function (provider) {
 
 window.mint = async function () {
   connectButton.setAttribute("disabled", true);
-  var contractAddress = "0xf61f31577e2144adb020fddad12e2fbf61f2ebb2";
+  var contractAddress = "0x6564c29e4d1699aa90457bb2ec2389d461f1c8cd";
   var contractAbi = JSON.stringify([
     {
       inputs: [{ internalType: "uint256", name: "quantity", type: "uint256" }],
