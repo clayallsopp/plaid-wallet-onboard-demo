@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <title>Demo Dapp</title>
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <div class="top"></div>
+    <div class="bottom"></div>
+    <div class="wrapper">
+      <div class="done hidden"></div>
+      <div class="btn" id="connect-btn" onclick="connectPlugin()">
+        Connect wallet
+      </div>
+      <div class="btn hidden" id="mint-btn" onclick="mint()"></div>
+    </div>
+  </body>
+  <script src="script.js"></script>
+  <script>
+    window.connectPlugin = async function () {
+      // Check if plugin is installed
+      if (!window.ethereum) {
+        document.getElementById("connect-btn").innerHTML = "No plugin detected";
+        return;
+      }
+
+      let accounts;
+      try {
+        accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+      } catch (e) {
+        document.getElementById("connect-btn").innerHTML =
+          "eth_requestAccounts error";
+        return;
+      }
+
+      if (!accounts[0]) {
+        return;
+      }
+
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x5" }],
+        });
+      } catch (e) {
+        // Documented MetaMask behavior
+        if (e.code === 4902) {
+          document.getElementById("connect-btn").innerHTML =
+            "Needs wallet_addEthereumChain";
+        } else {
+          document.getElementById("connect-btn").innerHTML =
+            "wallet_switchEthereumChain error";
+        }
+        return;
+      }
+
+      onConnect(window.ethereum);
+    };
+
+    var connectButton = document.getElementById("connect-btn");
+  </script>
+</html>
