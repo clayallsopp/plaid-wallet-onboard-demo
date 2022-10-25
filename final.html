@@ -12,13 +12,14 @@
     <div class="bottom"></div>
     <div class="wrapper">
       <div class="done hidden"></div>
-      <div class="btn" id="connect-btn" onclick="connectPlugin()">
+      <div class="btn" id="connect-btn" onclick="connectPlaid()">
         Connect wallet
       </div>
       <div class="btn hidden" id="mint-btn" onclick="mint()"></div>
     </div>
   </body>
   <script src="script.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <script>
     window.connectPlugin = async function () {
       // Check if plugin is installed
@@ -60,6 +61,45 @@
       }
 
       onConnect(window.ethereum);
+    };
+
+    window.connectPlaid = async function () {
+      document.getElementById("connect-btn").classList.add("hidden");
+
+      const plaidWeb3 = await window.Plaid.web3();
+      const chain = {
+        // RPC gateway URL to use for non-wallet methods
+        rpcUrl: "https://cloudflare-eth.com/v1/mainnet",
+        // EVM chain ID in hexadecimal format as described in https://eips.ethereum.org/EIPS/eip-695
+        // See https://chainlist.org/ for a list of common chains
+        chainId: "0x1",
+      };
+
+      const provider = await plaidWeb3.getCurrentEthereumProvider(chain);
+
+      let isActivated = false;
+      if (provider) {
+        isActivated = await plaidWeb3.isProviderActive(provider);
+      }
+      if (isActivated) {
+        onConnect(provider);
+        return;
+      }
+
+      const handler = plaidWeb3.createEthereumOnboarding({
+        // retrieve from https://dashboard.plaid.com/team/wallet-onboard
+        token: "link-sandbox-8b51f147-68ce-4183-8ad6-b7e0f8713d51",
+        chain: chain,
+        onSuccess: async (provider) => {
+          onConnect(provider);
+        },
+        onExit: (error, metadata) => {
+          document.getElementById("connect-btn").classList.remove("hidden");
+          connectButton.innerHTML = "Plaid exit";
+          connectButton.setAttribute("disabled", false);
+        },
+      });
+      handler.open();
     };
 
     var connectButton = document.getElementById("connect-btn");
