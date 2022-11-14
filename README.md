@@ -1,4 +1,4 @@
-# Plaid x BitGo Activate
+# Plaid Demo
 
 ```
 $ ./start.sh
